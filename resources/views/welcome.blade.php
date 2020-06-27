@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Laravel</title>
 
@@ -17,7 +18,12 @@
     getContent('/api/users/');
 
     $("body").on('click', '.page-link', function () {
-        getContent('/api/users?page='+$(this).text());
+        getContent('/api/users?page=' + $(this).text());
+    });
+
+    $("body").on('click', '.delete-row', function () {
+        deleteRow($(this).data('url'));
+        getContent('/api/users/');
     });
 
     function getContent(url) {
@@ -50,7 +56,7 @@
                 '<td>\n' +
                 '<button type="button" class="btn btn-warning">Show</button>\n' +
                 '<button type="button" class="btn btn-info">Edit</button>\n' +
-                '<button type="button" class="btn btn-danger">Delete</button>\n' +
+                '<button type="button" class="btn btn-danger delete-row"  data-url="/api/users/' + obj.user_id + '">Delete</button>\n' +
                 '</td>\n' +
                 '</tr>';
         }
@@ -61,19 +67,55 @@
         var html = '';
         for (var i = 1; i <= lastPage; i++) {
             var activeClass = '';
-            if(i === currentPage) {
+            if (i === currentPage) {
                 activeClass = 'active';
             }
-            html = html + '<li class="page-item '+activeClass+'"><a class="page-link" href="#">' + i + '</a></li>';
+            html = html + '<li class="page-item ' + activeClass + '"><a class="page-link" href="#">' + i + '</a></li>';
         }
         return html;
+    }
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    function deleteRow(url) {
+        $.ajax({
+            type: "DELETE",
+            url: url,
+            success: function (response) {
+                alert(response.status, response.message, 3000);
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    }
+
+    function alert(status, message, time) {
+        $('#alert-message').addClass('alert-'+status).text(message).show();
+        setTimeout(
+            function () {
+                $('#alert-message').removeClass('alert-'+status).text('').hide();
+            }, time
+        );
+    }
+
+    function editRow() {
+
+    }
+
+    function showRow() {
+
     }
 </script>
 
 <div class="container">
-    <h2>Table Head Colors</h2>
-    <p>The .thead-dark class adds a black background to table headers, and the .thead-light class adds a grey background
-        to table headers:</p>
+    <h2>Users list</h2>
+    <p>Table users</p>
+    <div id="alert-message" style="display: none" class="alert"></div>
     <table class="table">
         <thead class="thead-dark">
         <tr>
