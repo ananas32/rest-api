@@ -2,92 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
+use Ixudra\Curl\Facades\Curl;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function getInfo($id)
     {
-        return response()->json(User::paginate(10));
-
+        $url = url('api/users/' . $id);
+        $response = Curl::to($url)
+            ->get();
+        return json_decode($response);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $user = $this->getInfo($id);
+        return view('user-show', compact('user', 'json'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        $user = $this->getInfo($id);
+        $path = '/api/users/'.$user->user_id;
+        $method = 'PUT';
+        return view('user-create-edit', compact('user', 'json', 'path', 'method'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function create()
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $user = User::find($id);
-        $user->delete();
-
-        return response()->json([
-            'message' => 'success delete user',
-            'status' => 'success',
-        ]);
-
+        $path = '/api/users/';
+        $method = 'POST';
+        return view('user-create-edit', compact('user', 'json', 'path', 'method'));
     }
 }

@@ -16,3 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/users', function () {
+    return view('users');
+});
+
+Route::get('/users/create', 'UserController@create');
+Route::get('/users/{id}', 'UserController@show');
+Route::get('/users/{id}/edit', 'UserController@edit');
+
