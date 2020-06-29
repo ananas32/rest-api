@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 
 class TaskController extends Controller
@@ -16,7 +17,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-//        return response()->json(Task::paginate(10));
+        return response()->json(Task::orderBy('status', 'desc')->paginate(10));
     }
 
     /**
@@ -37,7 +38,7 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $this->update($request, null);
     }
 
     /**
@@ -48,7 +49,7 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        //
+        return response()->json(Task::find($id));
     }
 
     /**
@@ -59,7 +60,7 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        //
+        return $this->show($id);
     }
 
     /**
@@ -71,7 +72,32 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+            'user_id' => 'required',
+            'status' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ]);
+        }
+        if ($id == null) {
+            $user = new Task;
+        } else {
+            $user = Task::where('id', $id)->firstOrFail();
+        }
+        $user->title = $request->title;
+        $user->description = $request->description;
+        $user->user_id = $request->user_id;
+        $user->status = $request->status;
+        $user->save();
+
+        return response()->json([
+            'message' => 'save success'
+        ]);
     }
 
     /**
@@ -82,6 +108,12 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = Task::find($id);
+        $user->delete();
+
+        return response()->json([
+            'message' => 'success delete tasks',
+            'status' => 'success',
+        ]);
     }
 }

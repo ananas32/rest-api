@@ -18,6 +18,9 @@ class UserController extends Controller
      */
     public function index()
     {
+        if (isset(request()->paginate) && (request()->paginate == 'false')) {
+            return response()->json(User::orderBy('user_id', 'desc')->get());
+        }
         return response()->json(User::paginate(10));
 
     }

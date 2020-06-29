@@ -29,10 +29,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/users', function () {
-    return view('users');
-});
-
 Route::get('/login', function () {
     return view('auth.login');
 });
@@ -41,7 +37,16 @@ Route::get('/register', function () {
     return view('auth.register');
 });
 
+Route::get('/users', function () {
+    return view('users');
+});
 Route::get('/users/create', 'UserController@create');
 Route::get('/users/{id}', 'UserController@show');
 Route::get('/users/{id}/edit', 'UserController@edit');
 
+Route::get('/tasks', function () {
+    return view('tasks');
+});
+Route::get('/tasks/create', 'TaskController@create');
+Route::get('/tasks/{id}', 'TaskController@show');
+Route::get('/tasks/{id}/edit', 'TaskController@edit');
